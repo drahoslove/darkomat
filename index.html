@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dárkovač</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #aaa;
+    margin: 2rem auto;
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  table {
+    width: 100%;
+    margin: 2rem;
+    padding: 0.5em;
+    border-radius: 0.5rem;
+    background-color: #fff;
+  }
+  table thead {
+    font-weight: bold;
+  }
+  table thead tr:first-child td {
+    text-align: center;
+    font-size: 120%;
+    padding: 0.75em;
+  }
+  a {
+    color: #111
+  }
+  a:visited {
+    color: #666;
+  }
+</style>
+</head>
+<body>
+  <table>
+    <thead>
+      <tr>
+        <td colspan="99">Nedávno přidané</td>
+      </tr>
+      <tr>
+        <td>Název</td>
+        <td>Cena</td>
+        <td>Přidáno</td>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $gift := (.FilterAdded "720h") }}
+      <tr>
+        <td>
+          <a href="{{$gift.Url}}">{{$gift.Name}}</a>
+        </td>
+        <td>{{$gift.CurrentPrice}}</td>
+        <td>{{$gift.Created}}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  <!--  -->
+  <table>
+    <thead>
+      <tr>
+        <td colspan="99">Nedávno zlevněné</td>
+      </tr>
+      <tr>
+        <td>Název</td>
+        <td>Cena</td>
+        <td>Cena předtím</td>
+        <td>Změněno</td>
+        <td>Počet</td>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $gift := (.FilterDiscounted "720h") }}
+      <tr>
+        <td>
+          <a href="{{$gift.Url}}">{{$gift.Name}}</a>
+        </td>
+        <td>{{$gift.CurrentPrice}}</td>
+        <td>{{$gift.PreviousPrice}}</td>
+        <td>{{$gift.LastPriceChangeAt}}</td>
+        <td>{{$gift.CurrentStock}}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+  <!--  -->
+  <table>
+    <thead>
+      <tr>
+        <td colspan="99">Nedávno prodáno/naskladněno</td>
+      </tr>
+      <tr>
+        <td>Název</td>
+        <td>Počet</td>
+        <td>Počet předtím</td>
+        <td>Změněno</td>
+        <td>Cena</td>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $gift := (.FilterDiscounted "720h") }}
+      <tr>
+        <td>
+          <a href="{{$gift.Url}}">{{$gift.Name}}</a>
+        </td>
+        <td>{{$gift.CurrentStock}}</td>
+        <td>{{$gift.PreviousStock}}</td>
+        <td>{{$gift.LastStockChangeAt}}</td>
+        <td>{{$gift.CurrentPrice}}</td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</body>
+</html>
