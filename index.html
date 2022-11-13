@@ -105,7 +105,7 @@
       </tr>
     </thead>
     <tbody>
-      {{ range $gift := (.FilterDiscounted "720h") }}
+      {{ range $gift := (.FilterStockChanged "720h") }}
       <tr>
         <td>
           <a href="{{$gift.Url}}">{{$gift.Name}}</a>
