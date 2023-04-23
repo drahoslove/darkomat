@@ -164,10 +164,6 @@ func (gift *Gift) LastPriceChangeAt() time.Time {
 	return gift.History[0].Timestamp
 }
 
-func (gift *Gift) Created() string {
-	return strings.Split(gift.Creation.String(), ":00 +")[0]
-}
-
 // update records state if
 func (gift *Gift) record(state GiftState) bool {
 	isNewState := len(gift.History) == 0
@@ -249,7 +245,7 @@ func (gifts *Gifts) FilterStateChange(changed func(c, b GiftState) bool, duratio
 }
 
 func (gifts *Gifts) loadJson() error {
-	file, err := os.Open("gifts.json")
+	file, err := os.Open(JSON_FILE)
 	if err != nil {
 		return fmt.Errorf("failed to open json file, %s", err)
 	}
@@ -406,4 +402,8 @@ func deserializeCount(count any) float64 {
 	}
 
 	return 0
+}
+
+func FormatTime(t time.Time) string {
+	return strings.Split(t.String(), ":00 +")[0]
 }

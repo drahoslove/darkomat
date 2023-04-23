@@ -11,6 +11,7 @@ import (
 
 const CSV_URL = "https://www.alik.cz/s/darky/csv"
 const GOB_FILE = "data.gob"
+const JSON_FILE = "gifts.json"
 const INTERVAL = 10 * time.Minute
 
 var PORT = "4576" // tcp port for the http server
@@ -42,7 +43,7 @@ func main() {
 	go func() { // concurent refreshing loop
 		log.Println("starting refresh refreshing")
 		time.Sleep(toNextRoundTime())
-		for t := range time.Tick(time.Minute * 10) {
+		for t := range time.Tick(INTERVAL) {
 			log.Println(t)
 			gifts.refresh(roundTime(t))
 		}
@@ -50,7 +51,11 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		setupResponse(&w, r)
-		err := template.Must(template.ParseFiles("index.html")).Execute(w, gifts)
+		templ := template.Must(template.New("index.html").Funcs(template.FuncMap{
+			"formatTime": FormatTime,
+		}).ParseFiles("index.html"))
+
+		err := templ.Execute(w, gifts)
 		if err != nil {
 			log.Println(err)
 		}
@@ -64,10 +69,10 @@ func main() {
 	})
 	log.Println("listening on port", PORT)
 
-	log.Println(len(*gifts))
-	log.Println(len(gifts.FilterAdded("20000h")))
-	log.Println(len(gifts.FilterDiscounted("20000h")))
-	log.Println(len(gifts.FilterStockChanged("20000h")))
+	log.Println("total:", len(*gifts))
+	log.Println("added:", len(gifts.FilterAdded("8760h")))
+	log.Println("discounted:", len(gifts.FilterDiscounted("8760h")))
+	log.Println("stockchanged:", len(gifts.FilterStockChanged("8760h")))
 
 	if err := http.ListenAndServe(":"+PORT, nil); err != nil {
 		log.Fatal(err)
