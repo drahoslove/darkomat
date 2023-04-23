@@ -24,14 +24,19 @@ func init() {
 var gifts = &Gifts{}
 
 func main() {
-	log.Println("loading file")
+	log.Println("loading gob file")
 	gifts.load()
 	log.Println("loaded")
 
 	if len(*gifts) == 0 {
-		log.Println("nothing loaded")
+		log.Println("nothing loaded, trying json")
+		gifts.loadJson()
 		gifts.refresh(roundTime(time.Now()))
 		log.Println("initial refresh")
+		err := gifts.save()
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 	go func() { // concurent refreshing loop
