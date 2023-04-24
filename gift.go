@@ -172,7 +172,7 @@ func (gift *Gift) record(state GiftState) bool {
 		if prev.Price != state.Price {
 			isNewState = true
 		}
-		if prev.Count != state.Count && !math.IsNaN(prev.Count) && !math.IsNaN(state.Count) {
+		if !isSameCount(prev.Count, state.Count) {
 			isNewState = true
 		}
 	}
@@ -304,19 +304,19 @@ func (gifts *Gifts) refresh(timestamp time.Time) error {
 	}
 
 	changed := false
-
+	const ( // order of the columns
+		Druh = iota
+		Název
+		Kačky
+		Počet
+		Vznik
+		Odkaz
+	)
+	// check updated and new lines
 	for i, line := range lines {
 		if i == 0 { // skip the header line
 			continue
 		}
-		const ( // order of the columns
-			Druh = iota
-			Název
-			Kačky
-			Počet
-			Vznik
-			Odkaz
-		)
 		// parse columns
 		category := line[Druh]
 		name := line[Název]
@@ -344,6 +344,25 @@ func (gifts *Gifts) refresh(timestamp time.Time) error {
 			changed = true
 		}
 	}
+	// check removed lines
+loop:
+	for _, gift := range *gifts {
+		for _, line := range lines {
+			if line[Odkaz] == gift.Url {
+				continue loop
+			}
+		}
+		// gift not found in lines => was removed => count as 0
+		state := GiftState{
+			gift.History[len(gift.History)-1].Price,
+			0,
+			timestamp,
+		}
+		if gift.record(state) {
+			changed = true
+		}
+	}
+
 	if changed {
 		gifts.save()
 	}
